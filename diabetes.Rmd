@@ -1,0 +1,154 @@
+---
+title: "Probabilidade diagnostico de diabetes"
+author: "Stella"
+date: "16/12/2020"
+output: html_document
+---   
+
+Modelo de machine learning utilizando uma linguagem R.
+Objetivo: dentificar pacientes com alta probabilidade de serem diagnosticados 
+com diabetes, tendo, no mínimo, 75% de acurácia.
+```{r}
+library(caTools)
+library(caret)
+library(e1071)
+```
+
+```{r}
+diabetes <- read.csv(file = "C:/Users/stell/Desktop/diabetes.csv")
+
+head(diabetes)
+```
+```{r}
+str(diabetes)
+```
+
+
+
+
+```{r}
+colSums(is.na(diabetes))
+```
+
+
+```{r}
+summary(diabetes$Insulin)
+```
+
+
+```{r}
+boxplot(diabetes$Insulin)
+```
+Boxplot para cada coluna:
+```{r}
+boxplot(diabetes)
+```
+
+
+```{r}
+diabetes2 <- diabetes
+hist(diabetes2$Pregnancies)
+```
+
+
+```{r}
+hist(diabetes2$Age)
+```
+
+
+```{r}
+hist(diabetes2$BMI)
+
+```
+
+Construção do modelo:
+
+```{r}
+set.seed(123)
+index = sample.split(diabetes2$Pregnancies, SplitRatio = .70)
+index
+```
+Criando dados de treino e teste:
+```{r}
+train = subset(diabetes2, index == T)
+test = subset(diabetes2, index == F)
+
+dim(diabetes2)
+dim(train)
+dim(test)
+```
+
+```{r}
+modelo <- train(Outcome ~., data = train, method = "knn")
+```
+```{r}
+modelo$bestTune
+```
+
+
+```{r}
+modelo$results
+```
+```{r}
+modelo2 <- train(
+  Outcome ~., data = train, method = "knn",
+  tuneGrid = expand.grid(k = c(1:20)))
+
+modelo2$results
+```
+
+```{r}
+modelo2$bestTune
+```
+
+```{r}
+plot(modelo2)
+```
+
+Acurácia 75%:
+```{r}
+modelo3 <- train(
+  Outcome~., data = train, method = "naive_bayes")
+```
+
+
+```{r}
+modelo3$results
+modelo3$bestTune
+```
+
+```{r}
+set.seed(100)
+modelo4 <- train(Outcome ~., data = train, method = "svmRadialSigma",
+                 preProcess=c("center")
+                 )
+```
+```{r}
+modelo4$results
+modelo4$bestTune
+```
+```{r}
+predicoes <- predict(modelo4, test)
+predicoes
+```
+
+```{r}
+novos.data <- data.frame(
+  Pregnancies = c(30),
+  Glucose = c(111.50),
+  BloodPressure = c(70),
+  
+  
+)
+```
+
+
+
+
+
+
+
+
+
+
+
